@@ -1,0 +1,51 @@
+package rules.demo;
+
+import model.Employee;
+import model.Route;
+import model.RouteCoordinator;
+import model.EmployeeForRoute;
+import drools.DroolsCondition;
+import services.CalculatingEmployeeService;
+
+global java.util.Map mapGlobal;
+
+
+rule "map_skill"
+no-loop true
+when
+    $route : Route($listR : skillRequire)
+    $employee : Employee($listE : skillRequire)
+    eval(DroolsCondition.compare($listE, $listR))
+then
+    System.out.println($listE);
+    System.out.println("OKKK"); 
+end
+
+
+rule "calculating employee for route"
+when
+    $route : RouteCoordinator($routeId : routeId, $startTime : startTime, $endTime : endTime, $maxHour : maxHour,
+                        $orders : orders)
+then
+    System.out.println("OKKK calculate");
+    int numberOfEmployee = CalculatingEmployeeService.getEmployeeRequire($orders);
+    int numberOfDriver = CalculatingEmployeeService.timeDistance($startTime, $endTime) > $maxHour ? 2 : 1;
+    System.out.println("number Driver: " + numberOfDriver);
+    insert(new EmployeeForRoute($routeId, numberOfEmployee, numberOfDriver));
+end
+
+
+
+rule "handle EmployeeForRoute"
+when
+    $e : EmployeeForRoute(numberOfDriver > 1)
+then
+    mapGlobal.put("hello", "ok calculate 2 " + $e.getRouteId() + " e: " + $e.getNumberOfDriver());
+    System.out.println("ok calculate 2 " + $e.getRouteId() + " e: " + $e.getNumberOfDriver());
+end
+
+
+
+
+
+

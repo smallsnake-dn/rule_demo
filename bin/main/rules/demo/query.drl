@@ -1,0 +1,7 @@
+package rules.demo;
+
+
+
+query list_all_product
+    // $product : Product(id == 1, name == "Iphone")
+end
